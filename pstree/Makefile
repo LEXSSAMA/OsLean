@@ -1,6 +1,26 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -g
+TARGET = pstree
+SRCDIR =  .
+OBJDIR = ./build
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-NAME := $(shell basename $(PWD))
-export MODULE := M1
-all: $(NAME)-64 $(NAME)-32
+all: $(TARGET)
 
-include ../Makefile
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR) 
+	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+
+$(OBJDIR):
+	mkdir -p $@
+
+-include $(OBJS:.o=.d)
+
+clean:
+	rm -rf $(TARGET) $(OBJDIR) 
+
+.PHONY: all clean
